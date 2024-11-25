@@ -41,20 +41,22 @@ public class Weather {
         } catch (JsonProcessingException e) {
             System.err.println("Error with finding Dates: " + e.getMessage());
         }
-        startDateJson.append(jsonNode.path("forecasts").path(0).get("date").toString());
+        startDateJson.append(jsonNode != null ? jsonNode.path("forecasts").path(0).get("date").toString() : null);
         startDateJson.deleteCharAt(11);
         startDateJson.deleteCharAt(8);
         startDateJson.deleteCharAt(5);
         startDateJson.deleteCharAt(0);
-        endDateJson.append(jsonNode.path("forecasts").path(jsonNode.path("forecasts").size() - 1).get("date").toString());
+        endDateJson.append(jsonNode != null ?
+                jsonNode.path("forecasts").path(jsonNode.path("forecasts").size() - 1).get("date").toString()
+                : null);
         endDateJson.deleteCharAt(11);endDateJson.deleteCharAt(8);endDateJson.deleteCharAt(5);endDateJson.deleteCharAt(0);
-        System.out.print(String.format("Выберите даты с %1$s по %2$s в соответствующем формате для вывода информации о " +
-                "средней температуре за определенный период. \nДата начала периода: ", startDateJson, endDateJson));
+        System.out.printf("Выберите даты с %1$s по %2$s в соответствующем формате для вывода информации о " +
+                "средней температуре за определенный период. \nДата начала периода: ", startDateJson, endDateJson);
         String startDate = scanner.nextLine();
         System.out.print("Дата окончания периода: ");
         String endDate = scanner.nextLine();
-        System.out.println(String.format("Средняя температура в заданный промежуток времени: %.3f",
-                getAvgTemp(json, startDate, endDate)));
+        System.out.printf("Средняя температура в заданный промежуток времени: %.2f",
+                getAvgTemp(json, startDate, endDate));
     }
 
     private static String getKey(String path) {
@@ -67,7 +69,7 @@ public class Weather {
             }
             reader.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error with reading accessKey: " + e.getMessage());
         }
         return String.valueOf(key);
     }
@@ -105,7 +107,7 @@ public class Weather {
 
     private static double getAvgTemp(String jsonString, String startDate, String endDate) {
         ObjectMapper objectMapper = new ObjectMapper();
-        StringBuilder temp = null;
+        StringBuilder temp;
         int avgTemp = 0;
         int c = 0;
         try {
@@ -129,7 +131,7 @@ public class Weather {
     }
 
     private static void setResponseFile(String json) {
-        BufferedOutputStream outputStream = null;
+        BufferedOutputStream outputStream;
         String fileName = "weatherResponse.txt";
         try {
             outputStream = new BufferedOutputStream(new FileOutputStream(fileName));
